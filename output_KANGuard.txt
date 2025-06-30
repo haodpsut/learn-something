@@ -1,0 +1,170 @@
+(hao_test) userffmpegv2@userffmpegv2:~/hao/working/KANGuard7$ python code_Ling.py --csv_path Ling.csv --epochs 30 --batch_size 128 --k 5 --class_weight 6
+Embedding: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 90/90 [00:07<00:00, 12.68it/s]
+Epoch 01 | loss=12.6419 | acc=0.963 | recall=0.992 | f1=0.900 | roc=0.997
+Epoch 02 | loss=4.6241 | acc=0.983 | recall=0.985 | f1=0.952 | roc=0.998
+Epoch 03 | loss=0.9074 | acc=0.987 | recall=0.995 | f1=0.962 | roc=0.998
+Epoch 04 | loss=0.6639 | acc=0.993 | recall=0.997 | f1=0.979 | roc=0.998
+Epoch 05 | loss=0.4154 | acc=0.993 | recall=0.997 | f1=0.980 | roc=0.998
+Epoch 06 | loss=0.3190 | acc=0.997 | recall=0.997 | f1=0.990 | roc=0.999
+Epoch 07 | loss=0.2774 | acc=0.994 | recall=0.997 | f1=0.981 | roc=1.000
+Epoch 08 | loss=0.2047 | acc=0.996 | recall=0.998 | f1=0.989 | roc=1.000
+Epoch 09 | loss=0.1586 | acc=0.998 | recall=0.998 | f1=0.995 | roc=1.000
+Epoch 10 | loss=0.1279 | acc=0.999 | recall=0.998 | f1=0.997 | roc=1.000
+Epoch 11 | loss=0.1096 | acc=0.998 | recall=1.000 | f1=0.994 | roc=1.000
+Epoch 12 | loss=0.0872 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 13 | loss=0.0540 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 14 | loss=0.0490 | acc=0.999 | recall=1.000 | f1=0.998 | roc=1.000
+Epoch 15 | loss=0.0374 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 16 | loss=0.0295 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 17 | loss=0.0186 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 18 | loss=0.0195 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 19 | loss=0.0353 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 20 | loss=0.0202 | acc=0.999 | recall=1.000 | f1=0.998 | roc=1.000
+Epoch 21 | loss=0.0162 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 22 | loss=0.0055 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 23 | loss=0.0073 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 24 | loss=0.0037 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 25 | loss=0.0022 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 26 | loss=0.0036 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 27 | loss=0.0022 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 28 | loss=0.0019 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 29 | loss=0.0021 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 30 | loss=0.0010 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Done. Best F1 = 1.000
+
+===
+
+(hao_test) userffmpegv2@userffmpegv2:~/hao/working/KANGuard7$ python code_Assassin.py \
+    --csv_path Assassin.csv \
+    --epochs 30 \
+    --batch_size 256 \
+    --k 8 \
+    --class_weight 2
+Embedding: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 182/182 [00:15<00:00, 11.86it/s]
+Epoch 01 | loss=13.3338 | acc=0.824 | recall=0.448 | f1=0.584 | roc=0.936
+Epoch 02 | loss=6.8650 | acc=0.916 | recall=0.978 | f1=0.865 | roc=0.976
+Epoch 03 | loss=3.2973 | acc=0.945 | recall=0.970 | f1=0.906 | roc=0.988
+Epoch 04 | loss=2.3818 | acc=0.961 | recall=0.962 | f1=0.931 | roc=0.992
+Epoch 05 | loss=1.9750 | acc=0.969 | recall=0.956 | f1=0.945 | roc=0.994
+Epoch 06 | loss=1.7216 | acc=0.972 | recall=0.971 | f1=0.950 | roc=0.995
+Epoch 07 | loss=1.4901 | acc=0.973 | recall=0.981 | f1=0.953 | roc=0.996
+Epoch 08 | loss=1.3192 | acc=0.979 | recall=0.984 | f1=0.963 | roc=0.997
+Epoch 09 | loss=1.1340 | acc=0.979 | recall=0.992 | f1=0.963 | roc=0.998
+Epoch 10 | loss=1.0531 | acc=0.985 | recall=0.988 | f1=0.973 | roc=0.998
+Epoch 11 | loss=0.8760 | acc=0.986 | recall=0.995 | f1=0.976 | roc=0.999
+Epoch 12 | loss=0.7301 | acc=0.990 | recall=0.990 | f1=0.982 | roc=0.999
+Epoch 13 | loss=0.6145 | acc=0.991 | recall=0.994 | f1=0.983 | roc=0.999
+Epoch 14 | loss=0.4928 | acc=0.993 | recall=0.998 | f1=0.987 | roc=1.000
+Epoch 15 | loss=0.4354 | acc=0.996 | recall=0.995 | f1=0.992 | roc=1.000
+Epoch 16 | loss=0.3349 | acc=0.996 | recall=0.998 | f1=0.993 | roc=1.000
+Epoch 17 | loss=0.2485 | acc=0.997 | recall=0.999 | f1=0.995 | roc=1.000
+Epoch 18 | loss=0.1989 | acc=0.997 | recall=0.999 | f1=0.995 | roc=1.000
+Epoch 19 | loss=0.1861 | acc=0.998 | recall=0.997 | f1=0.997 | roc=1.000
+Epoch 20 | loss=0.1638 | acc=0.998 | recall=0.999 | f1=0.996 | roc=1.000
+Epoch 21 | loss=0.1329 | acc=0.999 | recall=0.999 | f1=0.998 | roc=1.000
+Epoch 22 | loss=0.0856 | acc=1.000 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 23 | loss=0.0936 | acc=0.999 | recall=0.999 | f1=0.998 | roc=1.000
+Epoch 24 | loss=0.0677 | acc=0.999 | recall=0.999 | f1=0.999 | roc=1.000
+Epoch 25 | loss=0.0574 | acc=1.000 | recall=0.999 | f1=0.999 | roc=1.000
+Epoch 26 | loss=0.0448 | acc=0.999 | recall=0.999 | f1=0.999 | roc=1.000
+Epoch 27 | loss=0.0528 | acc=0.999 | recall=0.999 | f1=0.999 | roc=1.000
+Epoch 28 | loss=0.0482 | acc=1.000 | recall=0.999 | f1=0.999 | roc=1.000
+Epoch 29 | loss=0.0378 | acc=1.000 | recall=0.999 | f1=1.000 | roc=1.000
+Epoch 30 | loss=0.0414 | acc=0.999 | recall=0.998 | f1=0.999 | roc=1.000
+Done.  Best F1 = 1.000
+
+===
+(hao_test) userffmpegv2@userffmpegv2:~/hao/working/KANGuard7$ python code_CEAS08.py \
+    --csv_path CEAS-08.csv \
+    --epochs 30 \
+    --batch_size 512 \
+    --k 6 \
+    --emb_model sentence-transformers/all-MiniLM-L6-v2
+Embedding: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 612/612 [00:44<00:00, 13.89it/s]
+Epoch 01 | loss=5.2015 | acc=0.971 | recall=0.970 | f1=0.973 | roc=0.994
+Epoch 02 | loss=0.9137 | acc=0.985 | recall=0.993 | f1=0.986 | roc=0.999
+Epoch 03 | loss=0.4912 | acc=0.993 | recall=0.994 | f1=0.994 | roc=1.000
+Epoch 04 | loss=0.2737 | acc=0.997 | recall=0.996 | f1=0.997 | roc=1.000
+Epoch 05 | loss=0.1492 | acc=0.999 | recall=0.998 | f1=0.999 | roc=1.000
+Epoch 06 | loss=0.0861 | acc=0.999 | recall=0.999 | f1=0.999 | roc=1.000
+Epoch 07 | loss=0.0492 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 08 | loss=0.0316 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 09 | loss=0.0205 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 10 | loss=0.0170 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 11 | loss=0.0142 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 12 | loss=0.0094 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 13 | loss=0.0074 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 14 | loss=0.0072 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 15 | loss=0.0059 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 16 | loss=0.0049 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 17 | loss=0.0043 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Early stopping.
+Done. Best F1 = 1.000
+
+====
+
+(hao_test) userffmpegv2@userffmpegv2:~/hao/working/KANGuard7$ python code_Enron.py \
+    --csv_path Enron.csv \
+    --epochs 30 \
+    --batch_size 512 \
+    --k 8 \
+    --class_weight 12
+Embedding: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 466/466 [00:31<00:00, 14.70it/s]
+Epoch 01 | loss=46.5895 | acc=0.532 | recall=1.000 | f1=0.694 | roc=0.957
+Epoch 02 | loss=16.9085 | acc=0.692 | recall=0.999 | f1=0.775 | roc=0.983
+Epoch 03 | loss=9.0598 | acc=0.936 | recall=0.993 | f1=0.943 | roc=0.989
+Epoch 04 | loss=5.5104 | acc=0.943 | recall=0.997 | f1=0.949 | roc=0.991
+Epoch 05 | loss=4.2995 | acc=0.951 | recall=0.999 | f1=0.956 | roc=0.993
+Epoch 06 | loss=3.5039 | acc=0.960 | recall=0.999 | f1=0.963 | roc=0.994
+Epoch 07 | loss=2.8419 | acc=0.968 | recall=1.000 | f1=0.971 | roc=0.996
+Epoch 08 | loss=2.3467 | acc=0.976 | recall=1.000 | f1=0.978 | roc=0.997
+Epoch 09 | loss=1.8680 | acc=0.980 | recall=1.000 | f1=0.981 | roc=0.998
+Epoch 10 | loss=1.5199 | acc=0.984 | recall=1.000 | f1=0.985 | roc=0.999
+Epoch 11 | loss=1.2293 | acc=0.988 | recall=1.000 | f1=0.989 | roc=0.999
+Epoch 12 | loss=1.0057 | acc=0.991 | recall=1.000 | f1=0.992 | roc=0.999
+Epoch 13 | loss=0.7931 | acc=0.993 | recall=1.000 | f1=0.994 | roc=1.000
+Epoch 14 | loss=0.6708 | acc=0.995 | recall=1.000 | f1=0.995 | roc=1.000
+Epoch 15 | loss=0.5438 | acc=0.996 | recall=1.000 | f1=0.996 | roc=1.000
+Epoch 16 | loss=0.4697 | acc=0.998 | recall=1.000 | f1=0.998 | roc=1.000
+Epoch 17 | loss=0.3645 | acc=0.998 | recall=1.000 | f1=0.998 | roc=1.000
+Epoch 18 | loss=0.3030 | acc=0.998 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 19 | loss=0.2834 | acc=0.999 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 20 | loss=0.2429 | acc=0.999 | recall=1.000 | f1=0.999 | roc=1.000
+Epoch 21 | loss=0.1987 | acc=0.999 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 22 | loss=0.1723 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 23 | loss=0.1821 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 24 | loss=0.1659 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 25 | loss=0.1413 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 26 | loss=0.1279 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 27 | loss=0.1043 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 28 | loss=0.1060 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 29 | loss=0.0865 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Epoch 30 | loss=0.0786 | acc=1.000 | recall=1.000 | f1=1.000 | roc=1.000
+Done. Best F1 = 1.000
+
+=================
+
+(working)
+python kang_guard_train_new.py \
+  --embedding_path trec_embeddings_5.pt \
+  --label_path trec_labels_5.pt \
+  --epochs 10000 \
+  --k 10
+
+
+
+
+
+python get_emb.py --csv_path TREC-05.csv \
+                      --output_embeddings embeddings_5.npy \
+                      --output_labels lbl_5.pt --top_k 500
+
+
+python train_567.py \
+  --embedding_path embeddings_5.npy \
+  --label_path lbl_5.pt \
+  --epochs 30 \
+  --k 10
+
+
+
