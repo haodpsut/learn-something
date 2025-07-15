@@ -1,0 +1,83 @@
+import os
+import numpy as np
+import pandas as pd
+from scipy.stats import mode
+
+WINDOW_SIZE = 128
+STEP_SIZE = 64
+DATA_DIR = "./PAMAP2_Dataset/Protocol"
+OUTPUT_FILE = "data_pamap2.npz"
+
+# Cột label
+LABEL_COL = 'activity_id'
+
+from scipy.stats import mode
+
+def sliding_windows(df, window_size=WINDOW_SIZE, step_size=STEP_SIZE):
+    windows = []
+    labels = []
+    data_len = df.shape[0]
+    for start in range(0, data_len - window_size + 1, step_size):
+        end = start + window_size
+        window = df.iloc[start:end]
+
+        # Lấy nhãn phổ biến nhất (mode) an toàn
+        if window[LABEL_COL].empty:
+            continue
+        res = mode(window[LABEL_COL], keepdims=False)
+        window_label = res.mode if hasattr(res, 'mode') else res[0]
+
+        features = window.drop(columns=['timestamp', 'activity_id', 'subject_id'], errors='ignore').values.flatten()
+        windows.append(features)
+        labels.append(window_label)
+
+    if len(windows) == 0:
+        return np.empty((0,)), np.empty((0,))
+
+    return np.vstack(windows), np.array(labels)
+
+
+def process_file(filepath):
+    print(f"Processing {filepath}")
+    # Dữ liệu PAMAP2 có 54 cột, cột 0 timestamp, cột cuối activity_id, subject_id có thể cột 1
+    # Vì dữ liệu .dat không có header, bạn phải tự định nghĩa cột:
+    columns = [
+        'timestamp', 'subject_id', 'activity_id'
+    ] + [f'sensor_{i}' for i in range(51)]  # 54 cột tổng, đã có 3 cột đầu
+
+    df = pd.read_csv(filepath, sep=r'\s+', header=None, names=columns)
+
+
+    X, y = sliding_windows(df)
+
+    return X, y
+
+def process_all():
+    all_x = []
+    all_y = []
+
+    for filename in os.listdir(DATA_DIR):
+        if not filename.endswith('.dat'):
+            continue
+        filepath = os.path.join(DATA_DIR, filename)
+        X, y = process_file(filepath)
+
+        if X.size == 0 or y.size == 0:
+            print(f"Warning: no windows generated from {filepath}, skipping.")
+            continue
+
+        all_x.append(X)
+        all_y.append(y)
+
+    if len(all_x) == 0:
+        raise RuntimeError("No valid data found!")
+
+    X_all = np.vstack(all_x)
+    y_all = np.hstack(all_y)
+
+    print(f"Final feature shape: {X_all.shape}, label shape: {y_all.shape}")
+    np.savez_compressed(OUTPUT_FILE, X=X_all, y=y_all)
+    print(f"Saved processed data to {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    process_all()
