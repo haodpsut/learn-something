@@ -1,114 +1,66 @@
-import sys
-import os
-from pathlib import Path
+# src/satgym/envs/routing_env.py
+
 import random
-import contextlib
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Dict, Optional
+from satgym import STARPERF_PATH
 
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 
-# --- Cấu hình logging chuyên nghiệp ---
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# --- Import các thành phần của SatGym ---
+from satgym.backend import StarPerfBackend
+from satgym.backend import User
+
 logger = logging.getLogger(__name__)
-
-# --- TÍCH HỢP STARPERF ---
-STARPERF_PATH = Path(__file__).resolve().parent.parent.parent.parent / "deps" / "StarPerf_Simulator"
-if str(STARPERF_PATH.resolve()) not in sys.path:
-    sys.path.insert(0, str(STARPERF_PATH.resolve()))
-
-try:
-    from src.constellation_generation.by_XML import constellation_configuration
-    from src.XML_constellation.constellation_connectivity import connectivity_mode_plugin_manager
-    from src.XML_constellation.constellation_entity.user import user as User
-    from src.XML_constellation.constellation_entity.satellite import satellite as Satellite
-    from src.XML_constellation.constellation_evaluation.exists_ISL.delay import distance_between_satellite_and_user
-except ImportError as e:
-    logger.critical(f"Failed to import StarPerf modules. Ensure StarPerf_Simulator is cloned in deps/. Error: {e}")
-    raise
-
-class StarPerfBackend:
-    # ... Class này giữ nguyên, không cần thay đổi ...
-    # ... (Toàn bộ code của StarPerfBackend) ...
-    """ Provides a clean API to interact with the StarPerf simulation backend. """
-    def __init__(self, config: Dict[str, Any]):
-        self.config = config
-        self.starperf_dir = STARPERF_PATH
-        self.constellation = self._initialize_constellation()
-        self.shell = self.constellation.shells[0]
-        self.num_satellites = self.shell.number_of_satellites
-        self.sat_id_map: Dict[int, Satellite] = {sat.id: sat for orbit in self.shell.orbits for sat in orbit.satellites}
-        sample_sat = self.sat_id_map[1]
-        self.simulation_steps = len(sample_sat.longitude)
-        logger.info(f"Initialized with {self.simulation_steps} simulation time steps.")
-    @contextlib.contextmanager
-    def _as_current_dir(self):
-        prev_cwd = Path.cwd()
-        os.chdir(self.starperf_dir)
-        try: yield
-        finally: os.chdir(prev_cwd)
-    def _initialize_constellation(self):
-        with self._as_current_dir():
-            logger.info(f"Loading constellation structure for {self.config['constellation_name']}...")
-            constellation = constellation_configuration.constellation_configuration(
-                dT=self.config['dT'], constellation_name=self.config['constellation_name']
-            )
-            logger.info("Building in-memory satellite connectivity...")
-            connection_manager = connectivity_mode_plugin_manager.connectivity_mode_plugin_manager()
-            connection_manager.execute_connection_policy(constellation=constellation, dT=self.config['dT'])
-        return constellation
-    def get_neighbors(self, sat_id: int, time_step: int) -> List[Satellite]:
-        current_sat = self.sat_id_map[sat_id]
-        if not hasattr(current_sat, 'ISL'): return []
-        neighbors = []
-        for isl_link in current_sat.ISL:
-            neighbor_id = -1
-            if isl_link.satellite1 == current_sat.id: neighbor_id = isl_link.satellite2
-            elif isl_link.satellite2 == current_sat.id: neighbor_id = isl_link.satellite1
-            if neighbor_id != -1: neighbors.append(self.sat_id_map[neighbor_id])
-        return neighbors
-    def get_satellite_position(self, sat: Satellite, time_step: int) -> np.ndarray:
-        safe_time_step_index = min(time_step, self.simulation_steps) - 1
-        alt = sat.altitude[safe_time_step_index] if isinstance(sat.altitude, list) else sat.altitude
-        return np.array([sat.longitude[safe_time_step_index], sat.latitude[safe_time_step_index], alt])
-    def find_nearest_satellite(self, user: User, time_step: int) -> Satellite:
-        return min(
-            (sat for orbit in self.shell.orbits for sat in orbit.satellites),
-            key=lambda sat: distance_between_satellite_and_user(user, sat, time_step)
-        )
 
 class RoutingEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 4}
 
     def __init__(self, **kwargs):
         super().__init__()
-        self.config = {
+
+        config = {
             "constellation_name": "Starlink",
             "simulation_steps": 100,
             "max_hops": 50,
             "reward_success": 100.0,
             "reward_failure": -100.0,
-            "reward_per_hop": -1.0, # Giữ lại chi phí cho mỗi bước nhảy
-            "distance_reward_factor": 1000.0 # Hằng số để chuẩn hóa reward shaping
+            "reward_per_hop": -1.0,
+            "distance_reward_factor": 1000.0
         }
-        self.config.update(kwargs)
+        config.update(kwargs)
+        self.config = config
+
         logger.info("--- Initializing SatGym-Routing-v0 Environment ---")
+
+        # --- LOGIC MỚI SẠCH SẼ HƠN ---
+        # 1. Tính toán dT cần thiết
+        # Chúng ta vẫn cần chạy tạm thời để lấy orbit_cycle, nhưng logic này có thể được cải thiện sau.
+        # Hiện tại, giữ nguyên để đảm bảo hoạt động.
         temp_config = self.config.copy()
         temp_config['dT'] = 1000
-        with contextlib.suppress(FileNotFoundError), StarPerfBackend._as_current_dir(StarPerfBackend(temp_config)):
-             temp_const = constellation_configuration.constellation_configuration(dT=temp_config['dT'], constellation_name=self.config['constellation_name'])
-             orbit_cycle = temp_const.shells[0].orbit_cycle
+        temp_backend = StarPerfBackend(starperf_path=STARPERF_PATH, config=temp_config)
+
+
+        orbit_cycle = temp_backend.shell.orbit_cycle
+
         target_steps = self.config['simulation_steps']
         self.config['dT'] = orbit_cycle // (target_steps - 1) if target_steps > 1 else orbit_cycle
         logger.info(f"Orbit cycle is {orbit_cycle}s. Calculated dT={self.config['dT']} to achieve ~{target_steps} steps.")
-        self.backend = StarPerfBackend(self.config)
+
+        # 2. Khởi tạo Backend chính thức
+        self.backend = StarPerfBackend(starperf_path=STARPERF_PATH, config=self.config)
+
         self.max_simulation_steps = self.backend.simulation_steps
+
+        # --- Phần còn lại của __init__ (giữ nguyên) ---
         self.MAX_NEIGHBORS = 6
         self.action_space = spaces.Discrete(self.MAX_NEIGHBORS)
         obs_shape = 3 + self.MAX_NEIGHBORS * 4
         self.observation_space = spaces.Box(low=-1.0, high=1.0, shape=(obs_shape,), dtype=np.float32)
+
         self._setup_ground_stations()
         logger.info(f"--- Initialization Complete for {self.backend.num_satellites} satellites ---")
 
@@ -117,7 +69,8 @@ class RoutingEnv(gym.Env):
             User(51.5, -0.1, "London"), User(40.7, -74.0, "NewYork"),
             User(1.35, 103.8, "Singapore"), User(-33.8, 151.2, "Sydney")
         ]
-            
+
+
     def reset(self, *, seed: Optional[int] = None, options: Optional[Dict] = None):
         super().reset(seed=seed)
         self.time_step = 1
@@ -132,7 +85,7 @@ class RoutingEnv(gym.Env):
     def step(self, action: int):
         self.hop_count += 1
         safe_time_step = min(self.time_step, self.max_simulation_steps)
-        
+
         # --- REWARD SHAPING: BƯỚC 1 ---
         # Lấy vị trí và tính khoảng cách đến đích TRƯỚC khi di chuyển
         pos_current_before = self.backend.get_satellite_position(self.current_sat, safe_time_step)
@@ -140,7 +93,7 @@ class RoutingEnv(gym.Env):
         distance_before = np.linalg.norm(pos_target - pos_current_before)
 
         neighbors = self.backend.get_neighbors(self.current_sat.id, safe_time_step)
-        
+
         terminated = False
         reward = self.config["reward_per_hop"] # Bắt đầu với chi phí mỗi bước
 
@@ -154,11 +107,11 @@ class RoutingEnv(gym.Env):
             # Tính khoảng cách đến đích SAU khi di chuyển và tính reward
             pos_current_after = self.backend.get_satellite_position(self.current_sat, safe_time_step)
             distance_after = np.linalg.norm(pos_target - pos_current_after)
-            
+
             # Phần thưởng là sự cải thiện về khoảng cách, đã được chuẩn hóa
             shaping_reward = (distance_before - distance_after) / self.config["distance_reward_factor"]
             reward += shaping_reward
-        
+
         # --- Xử lý các điều kiện kết thúc ---
         if not terminated and self.current_sat.id == self.target_sat.id:
             logger.info(f"Target satellite {self.target_sat.id} reached in {self.hop_count} hops!")
