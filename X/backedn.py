@@ -11,6 +11,7 @@ from skyfield.api import load, wgs84 # Đảm bảo có import này
 import networkx as nx
 import numpy as np
 import h5py # <-- DÒNG CẦN THÊM
+from .coverage import CoverageModel
 
 from .workload import Task # Import Task để sử dụng trong type hint
 
@@ -53,12 +54,19 @@ class StarPerfBackend:
         }
         
         
-                # --- THÊM CẤU HÌNH CHO TÀI NGUYÊN TÍNH TOÁN ---
+         # --- THÊM CẤU HÌNH CHO TÀI NGUYÊN TÍNH TOÁN ---
         self.compute_config = {
             "satellite_cpu_capacity_ghz": 10.0, # Năng lực tính toán của mỗi vệ tinh
             "ground_cpu_capacity_ghz": 1000.0, # Năng lực của Cloud (rất lớn)
             "cycles_per_flop": 1e-9 # Giả định: 1 GFLOP cần 1 chu kỳ CPU (GHz)
         }
+
+                # --- KHỞI TẠO CÁC MODULE MỚI ---
+        # Sử dụng h3_resolution từ config nếu có, nếu không thì mặc định là 3
+        h3_res = self.config.get("h3_resolution", 3)
+        self.coverage_model = CoverageModel(h3_resolution=h3_res)
+        # -----------------------------
+
 
         self.ts = load.timescale()
         self.constellation = self._initialize_constellation()
@@ -84,6 +92,43 @@ class StarPerfBackend:
         # key: (time_step, sat1_id, sat2_id), value: used_bandwidth_gbps
         self.link_bandwidth_state: Dict[tuple, float] = {}
 
+
+    # --- PHƯƠNG THỨC MỚI CHO BEAM HOPPING ---
+
+    def get_visible_ground_cells(self, satellite: Satellite, time_step: int) -> List[str]:
+        """
+        Determines the list of H3 ground cells within the satellite's footprint.
+
+        Args:
+            satellite: The satellite object.
+            time_step: The current simulation time step.
+
+        Returns:
+            A list of H3 cell IDs (strings).
+        """
+        # Lấy vị trí sub-point (hình chiếu của vệ tinh xuống mặt đất)
+        pos = self.get_satellite_position(satellite, time_step)
+        sub_lon, sub_lat = pos[0], pos[1]
+        
+        # Xác định bán kính vùng phủ sóng (footprint radius)
+        # Đây là một công thức hình học đơn giản hóa
+        earth_radius = 6371  # km
+        sat_altitude = pos[2]
+        # Giả định góc ngẩng tối thiểu tại rìa vùng phủ sóng là 10 độ
+        min_elevation_rad = np.radians(10) 
+        
+        # Tính toán dựa trên định luật sin
+        central_angle = np.arcsin(earth_radius / (earth_radius + sat_altitude) * np.cos(min_elevation_rad)) - min_elevation_rad
+        footprint_radius_km = earth_radius * central_angle / np.cos(central_angle)
+
+        # Lấy danh sách các ô H3 trong vùng phủ sóng
+        visible_cells = self.coverage_model.get_cells_in_footprint(
+            lat=sub_lat,
+            lon=sub_lon,
+            radius_km=footprint_radius_km
+        )
+        
+        return visible_cells
 
 
     # --- CÁC HÀM HELPER MỚI CHO TASK OFFLOADING ---
